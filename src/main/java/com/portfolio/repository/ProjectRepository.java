@@ -19,7 +19,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     Page<Project> findByNomeContainingIgnoreCase(String nome, Pageable pageable);
 
     @Query("SELECT p FROM Project p WHERE " +
-            "(:nome IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :nome, '%'))) AND " +
+            "(:nome IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', CAST(:nome AS string), '%'))) AND " +
             "(:status IS NULL OR p.status = :status)")
     Page<Project> findByFiltros(
             @Param("nome") String nome,
