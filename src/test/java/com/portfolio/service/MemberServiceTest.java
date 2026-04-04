@@ -85,4 +85,24 @@ class MemberServiceTest {
         assertNotNull(result);
         assertEquals(1L, result.getId());
     }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao buscar membro inexistente")
+    void deveFalharBuscarInexistente() {
+        when(memberRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> memberService.buscarPorId(99L));
+    }
+
+    @Test
+    @DisplayName("Deve listar todos os membros")
+    void deveListarTodos() {
+        when(memberRepository.findAll()).thenReturn(List.of(membro));
+        when(memberMapper.toResponseDTO(any())).thenReturn(responseDTO);
+
+        List<MemberResponseDTO> result = memberService.listarTodos();
+
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+    }
 }
