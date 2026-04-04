@@ -39,5 +39,18 @@ class ProjectStatusTest {
         }
     }
 
-  
+    @Test
+    @DisplayName("Não deve permitir transição a partir de CANCELADO exceto CANCELADO")
+    void naoDeveTransitarDeCancelado() {
+        for (ProjectStatus status : ProjectStatus.values()) {
+            if (status == ProjectStatus.CANCELADO) {
+                assertTrue(ProjectStatus.CANCELADO.podeTransitarPara(status));
+            } else {
+                assertFalse(ProjectStatus.CANCELADO.podeTransitarPara(status));
+            }
+        }
+    }
+
+    
+
 }
