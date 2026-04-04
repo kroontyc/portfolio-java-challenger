@@ -1,5 +1,6 @@
 package com.portfolio.controller;
 
+import com.portfolio.model.dto.MemberResponseDTO;
 import com.portfolio.model.dto.ProjectRequestDTO;
 import com.portfolio.model.dto.ProjectResponseDTO;
 import com.portfolio.model.dto.ProjectStatusUpdateDTO;
@@ -14,6 +15,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -69,5 +72,29 @@ public class ProjectController {
             @PathVariable Long id,
             @Valid @RequestBody ProjectStatusUpdateDTO dto) {
         return ResponseEntity.ok(projectService.atualizarStatus(id, dto));
+    }
+
+    // --- Associação de membros ---
+
+    @PostMapping("/{id}/members/{memberId}")
+    @Operation(summary = "Associar membro ao projeto")
+    public ResponseEntity<ProjectResponseDTO> associarMembro(
+            @PathVariable Long id,
+            @PathVariable Long memberId) {
+        return ResponseEntity.ok(projectService.associarMembro(id, memberId));
+    }
+
+    @DeleteMapping("/{id}/members/{memberId}")
+    @Operation(summary = "Desassociar membro do projeto")
+    public ResponseEntity<ProjectResponseDTO> desassociarMembro(
+            @PathVariable Long id,
+            @PathVariable Long memberId) {
+        return ResponseEntity.ok(projectService.desassociarMembro(id, memberId));
+    }
+
+    @GetMapping("/{id}/members")
+    @Operation(summary = "Listar membros do projeto")
+    public ResponseEntity<List<MemberResponseDTO>> listarMembros(@PathVariable Long id) {
+        return ResponseEntity.ok(projectService.listarMembros(id));
     }
 }
