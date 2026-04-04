@@ -59,4 +59,30 @@ class MemberServiceTest {
                 .build();
     }
 
+    @Test
+    @DisplayName("Deve criar membro com sucesso")
+    void deveCriarMembro() {
+        when(memberMapper.toEntity(any())).thenReturn(membro);
+        when(memberRepository.save(any())).thenReturn(membro);
+        when(memberMapper.toResponseDTO(any())).thenReturn(responseDTO);
+
+        MemberResponseDTO result = memberService.criar(requestDTO);
+
+        assertNotNull(result);
+        assertEquals("João Silva", result.getNome());
+        assertEquals("FUNCIONARIO", result.getAtribuicao());
+        verify(memberRepository).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve buscar membro por ID")
+    void deveBuscarPorId() {
+        when(memberRepository.findById(1L)).thenReturn(Optional.of(membro));
+        when(memberMapper.toResponseDTO(any())).thenReturn(responseDTO);
+
+        MemberResponseDTO result = memberService.buscarPorId(1L);
+
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
+    }
 }
