@@ -30,4 +30,13 @@ class RiskTest {
         assertEquals(Risk.MEDIO, Risk.calcular(new BigDecimal("300000"), inicio, fim));
         assertEquals(Risk.MEDIO, Risk.calcular(new BigDecimal("500000"), inicio, fim));
     }
+
+    @Test
+    @DisplayName("Deve retornar MEDIO para prazo entre 3 e 6 meses")
+    void deveRetornarMedioRiscoPorPrazo() {
+        LocalDate inicio = LocalDate.of(2026, 1, 1);
+        LocalDate fim = LocalDate.of(2026, 5, 1);
+
+        assertEquals(Risk.MEDIO, Risk.calcular(new BigDecimal("50000"), inicio, fim));
+    }
 }
