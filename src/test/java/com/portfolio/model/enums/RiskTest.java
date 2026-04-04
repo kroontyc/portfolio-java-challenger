@@ -66,4 +66,12 @@ class RiskTest {
         assertEquals(Risk.BAIXO, Risk.calcular(new BigDecimal("50000"), null, null));
         assertEquals(Risk.BAIXO, Risk.calcular(null, LocalDate.now(), null));
     }
+
+    @Test
+    @DisplayName("Deve retornar descrição correta")
+    void deveRetornarDescricao() {
+        assertEquals("Baixo risco", Risk.BAIXO.getDescricao());
+        assertEquals("Médio risco", Risk.MEDIO.getDescricao());
+        assertEquals("Alto risco", Risk.ALTO.getDescricao());
+    }
 }
