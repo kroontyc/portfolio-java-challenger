@@ -11,21 +11,6 @@ jobs:
     name: Testes Unitários
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_DB: portfolio_db
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
@@ -38,14 +23,10 @@ jobs:
           cache: maven
 
       - name: Rodar testes
-        run: mvn test -B
-        env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/portfolio_db
-          SPRING_DATASOURCE_USERNAME: postgres
-          SPRING_DATASOURCE_PASSWORD: postgres
+        run: mvn test -B -Dspring.profiles.active=test
 
       - name: Publicar relatório de cobertura
-        if: always() 
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
