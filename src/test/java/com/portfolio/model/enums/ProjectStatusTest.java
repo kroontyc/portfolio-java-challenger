@@ -18,5 +18,14 @@ class ProjectStatusTest {
         assertTrue(ProjectStatus.EM_ANDAMENTO.podeTransitarPara(ProjectStatus.ENCERRADO));
     }
 
- 
+    @Test
+    @DisplayName("Deve bloquear pulo de etapas")
+    void deveBloquearPuloDeEtapas() {
+        assertFalse(ProjectStatus.EM_ANALISE.podeTransitarPara(ProjectStatus.INICIADO));
+        assertFalse(ProjectStatus.EM_ANALISE.podeTransitarPara(ProjectStatus.EM_ANDAMENTO));
+        assertFalse(ProjectStatus.ANALISE_REALIZADA.podeTransitarPara(ProjectStatus.INICIADO));
+        assertFalse(ProjectStatus.ANALISE_APROVADA.podeTransitarPara(ProjectStatus.EM_ANDAMENTO));
+        assertFalse(ProjectStatus.PLANEJADO.podeTransitarPara(ProjectStatus.ENCERRADO));
+    }
+
 }
