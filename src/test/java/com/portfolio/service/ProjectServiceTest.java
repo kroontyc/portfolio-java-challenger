@@ -98,4 +98,32 @@ class ProjectServiceTest {
                 .status("EM_ANALISE")
                 .build();
     }
+
+    @Nested
+    @DisplayName("Criar projeto")
+    class CriarProjeto {
+
+        @Test
+        @DisplayName("Deve criar projeto com sucesso")
+        void deveCriarProjeto() {
+            when(memberRepository.findById(1L)).thenReturn(Optional.of(gerente));
+            when(projectMapper.toEntity(any(), any())).thenReturn(projeto);
+            when(projectRepository.save(any())).thenReturn(projeto);
+            when(projectMapper.toResponseDTO(any())).thenReturn(responseDTO);
+
+            ProjectResponseDTO result = projectService.criar(requestDTO);
+
+            assertNotNull(result);
+            assertEquals("Projeto Teste", result.getNome());
+            verify(projectRepository).save(any());
+        }
+
+        @Test
+        @DisplayName("Deve lançar exceção quando gerente não existe")
+        void deveFalharQuandoGerenteNaoExiste() {
+            when(memberRepository.findById(1L)).thenReturn(Optional.empty());
+
+            assertThrows(ResourceNotFoundException.class, () -> projectService.criar(requestDTO));
+        }
+    }
 }
