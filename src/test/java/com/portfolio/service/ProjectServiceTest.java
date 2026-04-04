@@ -126,4 +126,84 @@ class ProjectServiceTest {
             assertThrows(ResourceNotFoundException.class, () -> projectService.criar(requestDTO));
         }
     }
+
+    @Nested
+    @DisplayName("Buscar projeto")
+    class BuscarProjeto {
+
+        @Test
+        @DisplayName("Deve buscar projeto por ID")
+        void deveBuscarPorId() {
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(projeto));
+            when(projectMapper.toResponseDTO(any())).thenReturn(responseDTO);
+
+            ProjectResponseDTO result = projectService.buscarPorId(1L);
+
+            assertNotNull(result);
+            verify(projectRepository).findById(1L);
+        }
+
+        @Test
+        @DisplayName("Deve lançar exceção quando projeto não existe")
+        void deveFalharQuandoNaoExiste() {
+            when(projectRepository.findById(99L)).thenReturn(Optional.empty());
+
+            assertThrows(ResourceNotFoundException.class, () -> projectService.buscarPorId(99L));
+        }
+    }
+
+    @Nested
+    @DisplayName("Excluir projeto")
+    class ExcluirProjeto {
+
+        @Test
+        @DisplayName("Deve excluir projeto com status EM_ANALISE")
+        void deveExcluirEmAnalise() {
+            projeto.setStatus(ProjectStatus.EM_ANALISE);
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(projeto));
+
+            projectService.excluir(1L);
+
+            verify(projectRepository).delete(projeto);
+        }
+
+        @Test
+        @DisplayName("Deve excluir projeto com status ANALISE_REALIZADA")
+        void deveExcluirAnaliseRealizada() {
+            projeto.setStatus(ProjectStatus.ANALISE_REALIZADA);
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(projeto));
+
+            projectService.excluir(1L);
+
+            verify(projectRepository).delete(projeto);
+        }
+
+        @Test
+        @DisplayName("Não deve excluir projeto INICIADO")
+        void naoDeveExcluirIniciado() {
+            projeto.setStatus(ProjectStatus.INICIADO);
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(projeto));
+
+            assertThrows(BusinessException.class, () -> projectService.excluir(1L));
+            verify(projectRepository, never()).delete(any());
+        }
+
+        @Test
+        @DisplayName("Não deve excluir projeto EM_ANDAMENTO")
+        void naoDeveExcluirEmAndamento() {
+            projeto.setStatus(ProjectStatus.EM_ANDAMENTO);
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(projeto));
+
+            assertThrows(BusinessException.class, () -> projectService.excluir(1L));
+        }
+
+        @Test
+        @DisplayName("Não deve excluir projeto ENCERRADO")
+        void naoDeveExcluirEncerrado() {
+            projeto.setStatus(ProjectStatus.ENCERRADO);
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(projeto));
+
+            assertThrows(BusinessException.class, () -> projectService.excluir(1L));
+        }
+    }
 }
