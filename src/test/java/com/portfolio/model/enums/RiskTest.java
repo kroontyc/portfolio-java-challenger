@@ -58,4 +58,12 @@ class RiskTest {
 
         assertEquals(Risk.ALTO, Risk.calcular(new BigDecimal("50000"), inicio, fim));
     }
+
+    @Test
+    @DisplayName("Deve retornar BAIXO quando valores são nulos")
+    void deveRetornarBaixoQuandoNulo() {
+        assertEquals(Risk.BAIXO, Risk.calcular(null, null, null));
+        assertEquals(Risk.BAIXO, Risk.calcular(new BigDecimal("50000"), null, null));
+        assertEquals(Risk.BAIXO, Risk.calcular(null, LocalDate.now(), null));
+    }
 }
