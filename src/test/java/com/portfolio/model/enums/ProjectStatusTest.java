@@ -28,4 +28,16 @@ class ProjectStatusTest {
         assertFalse(ProjectStatus.PLANEJADO.podeTransitarPara(ProjectStatus.ENCERRADO));
     }
 
+    @Test
+    @DisplayName("Deve permitir cancelar a qualquer momento")
+    void devePermitirCancelarSempre() {
+        for (ProjectStatus status : ProjectStatus.values()) {
+            if (status != ProjectStatus.ENCERRADO && status != ProjectStatus.CANCELADO) {
+                assertTrue(status.podeTransitarPara(ProjectStatus.CANCELADO),
+                        "Deveria permitir cancelar a partir de " + status);
+            }
+        }
+    }
+
+  
 }
