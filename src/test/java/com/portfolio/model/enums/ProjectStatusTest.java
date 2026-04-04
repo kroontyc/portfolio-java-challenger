@@ -40,6 +40,18 @@ class ProjectStatusTest {
     }
 
     @Test
+    @DisplayName("Não deve permitir transição a partir de ENCERRADO exceto CANCELADO")
+    void naoDeveTransitarDeEncerrado() {
+        for (ProjectStatus status : ProjectStatus.values()) {
+            if (status == ProjectStatus.CANCELADO) {
+                assertTrue(ProjectStatus.ENCERRADO.podeTransitarPara(status));
+            } else {
+                assertFalse(ProjectStatus.ENCERRADO.podeTransitarPara(status));
+            }
+        }
+    }
+
+    @Test
     @DisplayName("Não deve permitir transição a partir de CANCELADO exceto CANCELADO")
     void naoDeveTransitarDeCancelado() {
         for (ProjectStatus status : ProjectStatus.values()) {
@@ -50,7 +62,5 @@ class ProjectStatusTest {
             }
         }
     }
-
-    
 
 }
