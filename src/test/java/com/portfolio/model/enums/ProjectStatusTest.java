@@ -63,4 +63,11 @@ class ProjectStatusTest {
         }
     }
 
+    @Test
+    @DisplayName("Deve retornar descrição correta")
+    void deveRetornarDescricao() {
+        assertEquals("Em análise", ProjectStatus.EM_ANALISE.getDescricao());
+        assertEquals("Encerrado", ProjectStatus.ENCERRADO.getDescricao());
+    }
+
 }
