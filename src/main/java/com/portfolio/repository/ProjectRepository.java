@@ -29,6 +29,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     List<Project> findByGerenteId(Long gerenteId);
 
+    @Query("SELECT DISTINCT p FROM Project p LEFT JOIN FETCH p.membros LEFT JOIN FETCH p.gerente")
+    List<Project> findAllWithMembros();
+
     @Query("SELECT COUNT(p) FROM Project p JOIN p.membros m " +
             "WHERE m.id = :membroId AND p.status NOT IN (:statusExcluidos)")
     long contarProjetosAtivosDoMembro(
