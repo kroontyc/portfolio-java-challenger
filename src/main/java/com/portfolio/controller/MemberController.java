@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/members")
-@Tag(name = "Membros", description = "API externa mockada para gerenciamento de membros")
+@Tag(name = "Membros", description = "API externa mockada para criação e consulta de membros")
 public class MemberController {
 
     private final MemberService memberService;
@@ -26,7 +26,7 @@ public class MemberController {
     }
 
     @PostMapping
-    @Operation(summary = "Criar novo membro", description = "Cria um membro enviando nome e atribuição (cargo)")
+    @Operation(summary = "Criar membro", description = "Cria um novo membro com nome e atribuição (FUNCIONARIO, GERENTE ou DIRETOR)")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Membro criado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos")
@@ -49,7 +49,7 @@ public class MemberController {
 
     @GetMapping
     @Operation(summary = "Listar todos os membros")
-    @ApiResponse(responseCode = "200", description = "Lista de membros retornada com sucesso")
+    @ApiResponse(responseCode = "200", description = "Lista de membros retornada")
     public ResponseEntity<List<MemberResponseDTO>> listarTodos() {
         List<MemberResponseDTO> response = memberService.listarTodos();
         return ResponseEntity.ok(response);
