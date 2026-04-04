@@ -105,4 +105,14 @@ class MemberServiceTest {
         assertFalse(result.isEmpty());
         assertEquals(1, result.size());
     }
+
+    @Test
+    @DisplayName("Deve retornar lista vazia quando não há membros")
+    void deveRetornarListaVazia() {
+        when(memberRepository.findAll()).thenReturn(List.of());
+
+        List<MemberResponseDTO> result = memberService.listarTodos();
+
+        assertTrue(result.isEmpty());
+    }
 }
