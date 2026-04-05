@@ -266,4 +266,86 @@ class ProjectServiceTest {
             assertEquals(LocalDate.now(), projeto.getDataRealTermino());
         }
     }
+
+    @Nested
+    @DisplayName("Associar membros")
+    class AssociarMembros {
+
+        @Test
+        @DisplayName("Deve associar funcionário ao projeto")
+        void deveAssociarFuncionario() {
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(projeto));
+            when(memberRepository.findById(2L)).thenReturn(Optional.of(funcionario));
+            when(projectRepository.contarProjetosAtivosDoMembro(anyLong(), any())).thenReturn(0L);
+            when(projectRepository.save(any())).thenReturn(projeto);
+            when(projectMapper.toResponseDTO(any())).thenReturn(responseDTO);
+
+            projectService.associarMembro(1L, 2L);
+
+            assertTrue(projeto.getMembros().contains(funcionario));
+        }
+
+        @Test
+        @DisplayName("Não deve associar gerente ao projeto")
+        void naoDeveAssociarGerente() {
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(projeto));
+            when(memberRepository.findById(1L)).thenReturn(Optional.of(gerente));
+
+            assertThrows(BusinessException.class, () -> projectService.associarMembro(1L, 1L));
+        }
+
+        @Test
+        @DisplayName("Não deve associar membro que já está no projeto")
+        void naoDeveAssociarDuplicado() {
+            projeto.getMembros().add(funcionario);
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(projeto));
+            when(memberRepository.findById(2L)).thenReturn(Optional.of(funcionario));
+
+            assertThrows(BusinessException.class, () -> projectService.associarMembro(1L, 2L));
+        }
+
+        @Test
+        @DisplayName("Não deve exceder 10 membros por projeto")
+        void naoDeveExcederMaxMembros() {
+            for (int i = 0; i < 10; i++) {
+                projeto.getMembros().add(Member.builder().id((long) (i + 10)).nome("Membro " + i).atribuicao(MemberRole.FUNCIONARIO).build());
+            }
+
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(projeto));
+            when(memberRepository.findById(2L)).thenReturn(Optional.of(funcionario));
+
+            assertThrows(BusinessException.class, () -> projectService.associarMembro(1L, 2L));
+        }
+
+        @Test
+        @DisplayName("Não deve associar membro com 3 projetos ativos")
+        void naoDeveExcederProjetosAtivos() {
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(projeto));
+            when(memberRepository.findById(2L)).thenReturn(Optional.of(funcionario));
+            when(projectRepository.contarProjetosAtivosDoMembro(anyLong(), any())).thenReturn(3L);
+
+            assertThrows(BusinessException.class, () -> projectService.associarMembro(1L, 2L));
+        }
+
+        @Test
+        @DisplayName("Deve desassociar membro com sucesso")
+        void deveDesassociarMembro() {
+            projeto.getMembros().add(funcionario);
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(projeto));
+            when(projectRepository.save(any())).thenReturn(projeto);
+            when(projectMapper.toResponseDTO(any())).thenReturn(responseDTO);
+
+            projectService.desassociarMembro(1L, 2L);
+
+            assertFalse(projeto.getMembros().contains(funcionario));
+        }
+
+        @Test
+        @DisplayName("Deve falhar ao desassociar membro que não está no projeto")
+        void deveFalharDesassociarInexistente() {
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(projeto));
+
+            assertThrows(BusinessException.class, () -> projectService.desassociarMembro(1L, 99L));
+        }
+    }
 }
