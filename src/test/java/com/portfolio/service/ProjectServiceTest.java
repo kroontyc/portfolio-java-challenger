@@ -206,4 +206,64 @@ class ProjectServiceTest {
             assertThrows(BusinessException.class, () -> projectService.excluir(1L));
         }
     }
+
+    @Nested
+    @DisplayName("Atualizar status")
+    class AtualizarStatus {
+
+        @Test
+        @DisplayName("Deve atualizar status na sequência correta")
+        void deveAtualizarStatusCorreto() {
+            projeto.setStatus(ProjectStatus.EM_ANALISE);
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(projeto));
+            when(projectRepository.save(any())).thenReturn(projeto);
+            when(projectMapper.toResponseDTO(any())).thenReturn(responseDTO);
+
+            ProjectStatusUpdateDTO dto = new ProjectStatusUpdateDTO(ProjectStatus.ANALISE_REALIZADA);
+            projectService.atualizarStatus(1L, dto);
+
+            assertEquals(ProjectStatus.ANALISE_REALIZADA, projeto.getStatus());
+        }
+
+        @Test
+        @DisplayName("Deve lançar exceção ao pular etapas")
+        void deveFalharAoPularEtapas() {
+            projeto.setStatus(ProjectStatus.EM_ANALISE);
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(projeto));
+
+            ProjectStatusUpdateDTO dto = new ProjectStatusUpdateDTO(ProjectStatus.INICIADO);
+
+            assertThrows(BusinessException.class, () -> projectService.atualizarStatus(1L, dto));
+        }
+
+        @Test
+        @DisplayName("Deve permitir cancelar a qualquer momento")
+        void devePermitirCancelar() {
+            projeto.setStatus(ProjectStatus.INICIADO);
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(projeto));
+            when(projectRepository.save(any())).thenReturn(projeto);
+            when(projectMapper.toResponseDTO(any())).thenReturn(responseDTO);
+
+            ProjectStatusUpdateDTO dto = new ProjectStatusUpdateDTO(ProjectStatus.CANCELADO);
+            projectService.atualizarStatus(1L, dto);
+
+            assertEquals(ProjectStatus.CANCELADO, projeto.getStatus());
+        }
+
+        @Test
+        @DisplayName("Deve preencher data real de término ao encerrar")
+        void devePreencherDataRealTermino() {
+            projeto.setStatus(ProjectStatus.EM_ANDAMENTO);
+            projeto.setDataRealTermino(null);
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(projeto));
+            when(projectRepository.save(any())).thenReturn(projeto);
+            when(projectMapper.toResponseDTO(any())).thenReturn(responseDTO);
+
+            ProjectStatusUpdateDTO dto = new ProjectStatusUpdateDTO(ProjectStatus.ENCERRADO);
+            projectService.atualizarStatus(1L, dto);
+
+            assertNotNull(projeto.getDataRealTermino());
+            assertEquals(LocalDate.now(), projeto.getDataRealTermino());
+        }
+    }
 }
